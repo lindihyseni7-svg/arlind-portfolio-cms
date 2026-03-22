@@ -1,0 +1,33 @@
+ARLIND HYSENI
+Full-Stack Software Engineer
+
+PROFILE
+I build modern software products with Java, MySQL, HTML, CSS and JavaScript.
+My focus is on clean architecture, practical problem solving and portfolio-grade web systems.
+
+EDUCATION
+Student at FSHMN with a strong interest in software engineering, mathematics and system design.
+
+CORE SKILLS
+- Java
+- MySQL
+- JavaScript
+- HTML
+- CSS
+- Bootstrap
+- GitHub
+- PHP
+
+PROJECT HIGHLIGHTS
+- Portfolio CMS with Java backend, admin dashboard, login, CSRF protection and cloud database
+- Student management style applications using Java and SQL
+- Contact form systems with database persistence and admin message review
+
+LOCATION
+Kosove
+
+CONTACT
+Please use the live portfolio contact form or update this file with your preferred direct contact details.
+
+LIVE SITE
+This CV file is served by the portfolio application and can be replaced later with a PDF version.

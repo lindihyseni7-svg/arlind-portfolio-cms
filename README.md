@@ -718,3 +718,39 @@ Ky aplikacion eshte tashme nje `Portfolio CMS` real me:
 - bazat e sigurise
 
 Pra, jo vetem qe e ke ndertuar nje website personal, por ke ndertuar nje sistem qe te meson menyren si mendohet nje produkt software nga fillimi deri te struktura gati per publikim.
+
+## 21. Custom Domain si `arlindhyseni.dev`
+
+Linku aktual i deploy-it mund te jete nje link teknik i platformes, si p.sh. `onrender.com`. Kjo eshte normale ne fazen e deploy-it te pare.
+
+Nese deshiron nje identitet me profesional, atehere hapi i radhes eshte `custom domain`.
+
+Shembull:
+
+- `arlindhyseni.dev`
+- `www.arlindhyseni.dev`
+- `portfolio.arlindhyseni.dev`
+
+Logjika eshte kjo:
+
+1. regjistron domain-in te nje registrar
+2. shton domain-in ne panelin e platformes ku eshte hostuar aplikacioni
+3. platforma te jep `DNS records`
+4. ato `DNS records` i vendos te kompania ku e ke blere domain-in
+5. pas propagimit, website-i hapet me domain-in tend
+
+Kjo nuk ndryshon kodin kryesor te aplikacionit. Pra aplikacioni yt vazhdon te punoje po njejte, vetem se:
+
+- URL-ja behet me profesionale
+- portfolio duket me serioz ne CV dhe LinkedIn
+- brand-i yt personal behet me i forte
+
+Ky projekt tashme eshte pergatitur qe kjo kalim te jete i natyrshem, sepse:
+
+- ka deploy online funksional
+- ka route publike te qarta
+- ka `robots.txt`
+- ka `sitemap.xml`
+- ka `CV download`
+
+Pra, kur te vij momenti per domain-in tend personal, kalimi nuk do te jete nga zero, por nje hap i arsyeshem mbi infrastrukturen qe tashme e ke.

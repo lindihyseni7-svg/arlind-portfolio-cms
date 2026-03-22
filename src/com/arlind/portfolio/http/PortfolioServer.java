@@ -137,6 +137,15 @@ public class PortfolioServer {
             writeHtml(outputStream, readResource("/static/index.html"), csrfCookie);
             return;
         }
+        if ("/cv".equals(path)) {
+            writeAttachment(
+                    outputStream,
+                    "text/plain; charset=utf-8",
+                    readResource("/static/Arlind-Hyseni-CV.txt").getBytes(StandardCharsets.UTF_8),
+                    "Arlind-Hyseni-CV.txt"
+            );
+            return;
+        }
         if ("/login".equals(path)) {
             writeHtml(outputStream, readResource("/static/login.html"), csrfCookie);
             return;
@@ -155,6 +164,22 @@ public class PortfolioServer {
         }
         if ("/api/csrf-token".equals(path)) {
             writeJson(outputStream, 200, "{\"token\":\"" + csrfTokenFromHeaders(headers, csrfCookie) + "\"}", csrfCookie);
+            return;
+        }
+        if ("/robots.txt".equals(path)) {
+            String baseUrl = requestBaseUrl(headers);
+            String body = "User-agent: *\nAllow: /\nSitemap: " + baseUrl + "/sitemap.xml\n";
+            writeResponse(outputStream, 200, "text/plain; charset=utf-8", body.getBytes(StandardCharsets.UTF_8), null);
+            return;
+        }
+        if ("/sitemap.xml".equals(path)) {
+            String baseUrl = requestBaseUrl(headers);
+            String body = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                    + "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n"
+                    + "  <url><loc>" + baseUrl + "/</loc></url>\n"
+                    + "  <url><loc>" + baseUrl + "/cv</loc></url>\n"
+                    + "</urlset>\n";
+            writeResponse(outputStream, 200, "application/xml; charset=utf-8", body.getBytes(StandardCharsets.UTF_8), null);
             return;
         }
         if ("/api/profile".equals(path)) {
@@ -474,6 +499,12 @@ public class PortfolioServer {
         return null;
     }
 
+    private String requestBaseUrl(Map<String, String> headers) {
+        String host = headers.getOrDefault("host", "localhost:" + getPort());
+        String protocol = headers.getOrDefault("x-forwarded-proto", "http");
+        return protocol + "://" + host;
+    }
+
     private String readBody(BufferedReader reader, Map<String, String> headers) throws IOException {
         int contentLength = headers.containsKey("content-length") ? Integer.parseInt(headers.get("content-length")) : 0;
         if (contentLength <= 0) {
@@ -583,6 +614,11 @@ public class PortfolioServer {
     private void writeJson(OutputStream outputStream, int statusCode, String json, String setCookieHeader) throws IOException {
         String extraHeaders = setCookieHeader == null ? null : "Set-Cookie: " + setCookieHeader + "\r\n";
         writeResponse(outputStream, statusCode, "application/json; charset=utf-8", json.getBytes(StandardCharsets.UTF_8), extraHeaders);
+    }
+
+    private void writeAttachment(OutputStream outputStream, String contentType, byte[] body, String fileName) throws IOException {
+        String extraHeaders = "Content-Disposition: attachment; filename=\"" + fileName + "\"\r\n";
+        writeResponse(outputStream, 200, contentType, body, extraHeaders);
     }
 
     private void writeRedirect(OutputStream outputStream, String location) throws IOException {
