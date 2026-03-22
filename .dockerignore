@@ -1,0 +1,8 @@
+out
+uploads
+java-stdout.log
+java-stderr.log
+.git
+.idea
+.vscode
+*.class

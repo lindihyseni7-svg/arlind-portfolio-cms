@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin CMS | Arlind Hyseni</title>
+    <style>
+        :root {
+            --panel: #ffffff;
+            --text: #17202a;
+            --muted: #64748b;
+            --line: rgba(23, 32, 42, 0.1);
+            --accent: #0f766e;
+            --accent-2: #2563eb;
+            --danger: #dc2626;
+            --shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            color: var(--text);
+            background: linear-gradient(180deg, #eef4ff, #f8fafc 40%, #eef2f7 100%);
+        }
+        .shell { width: min(1200px, calc(100% - 28px)); margin: 0 auto; }
+        .topbar {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(23, 32, 42, 0.08);
+            z-index: 10;
+        }
+        .topbar-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+        }
+        .brand, .back-link { text-decoration: none; color: var(--text); font-weight: 800; }
+        .back-link { color: var(--accent); }
+        main { padding: 34px 0 50px; }
+        .hero {
+            margin-bottom: 22px;
+            padding: 30px;
+            background: linear-gradient(135deg, #0f766e, #2563eb);
+            color: white;
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+        }
+        .hero p { margin-bottom: 8px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.8rem; }
+        .hero h1 { margin: 0 0 10px; font-size: clamp(2rem, 4vw, 3rem); }
+        .stack { display: grid; gap: 22px; }
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+        .card-header { display: flex; justify-content: space-between; gap: 16px; align-items: start; margin-bottom: 18px; }
+        .eyebrow { margin: 0 0 8px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.78rem; }
+        .card h2 { margin: 0; }
+        .card-header span { color: var(--muted); }
+        .grid-two { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+        form { display: grid; gap: 10px; }
+        label { font-weight: 700; }
+        input, textarea {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(100, 116, 139, 0.22);
+            padding: 14px 16px;
+            font: inherit;
+            background: #f8fafc;
+        }
+        input:focus, textarea:focus {
+            outline: 2px solid rgba(15, 118, 110, 0.18);
+            border-color: rgba(15, 118, 110, 0.35);
+        }
+        button {
+            border: none;
+            border-radius: 14px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #0f766e, #2563eb);
+            color: white;
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        button.secondary { background: #e2e8f0; color: #17202a; }
+        button.danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .status { min-height: 24px; margin: 0; font-weight: 700; }
+        .status.success { color: #0f766e; }
+        .status.error { color: #dc2626; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            text-align: left;
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.16);
+            vertical-align: top;
+        }
+        th { color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; }
+        td { line-height: 1.6; }
+        .table-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .empty-state { text-align: center; color: var(--muted); padding: 20px 0 6px; }
+        .modal { position: fixed; inset: 0; display: none; z-index: 50; }
+        .modal.is-open { display: block; }
+        .modal-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.42); }
+        .modal-card { position: relative; width: min(560px, calc(100% - 20px)); margin: 8vh auto 0; background: white; border-radius: 24px; padding: 24px; box-shadow: var(--shadow); }
+        .modal-header { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 14px; }
+        .icon-button { width: 40px; height: 40px; border-radius: 999px; border: none; background: #e2e8f0; color: #17202a; font-size: 1.4rem; }
+        @media (max-width: 768px) {
+            .grid-two { grid-template-columns: 1fr; }
+            .topbar-inner, .card-header { flex-direction: column; align-items: start; }
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tr {
+                margin-bottom: 14px;
+                border: 1px solid rgba(100, 116, 139, 0.16);
+                border-radius: 18px;
+                padding: 10px;
+                background: #fff;
+            }
+            td {
+                border-bottom: none;
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="shell topbar-inner">
+            <a class="brand" href="/admin">Arlind Hyseni CMS</a>
+            <div class="table-actions">
+                <a class="back-link" href="/">Kthehu te faqja publike</a>
+                <form id="logoutForm" method="post" action="/logout" style="display:inline;">
+                    <input id="logoutCsrfToken" name="csrf_token" type="hidden">
+                    <button type="submit" class="danger">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="shell">
+        <section class="hero">
+            <p>Dashboard</p>
+            <h1>Full Control CMS</h1>
+            <span>Menaxho profilin, password-in, projektet dhe mesazhet ne nje vend.</span>
+        </section>
+
+        <div class="stack">
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <p class="eyebrow">Settings</p>
+                        <h2>Profile Settings</h2>
+                    </div>
+                    <span>POST /api/settings</span>
+                </div>
+                <form id="settingsForm">
+                    <input id="settingsCsrfToken" name="csrf_token" type="hidden">
+                    <div class="grid-two">
+                        <div>
+                            <label for="fullName">Emri i plote</label>
+                            <input id="fullName" name="fullName" type="text" required>
+                        </div>
+                        <div>
+                            <label for="title">Titulli</label>
+                            <input id="title" name="title" type="text" required>
+                        </div>
+                        <div>
+                            <label for="age">Mosha</label>
+                            <input id="age" name="age" type="number" min="1" required>
+                        </div>
+                        <div>
+                            <label for="location">Lokacioni</label>
+                            <input id="location" name="location" type="text" required>
+                        </div>
+                        <div>
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="email" required>
+                        </div>
+                        <div>
+                            <label for="imageUrl">Linku i fotos</label>
+                            <input id="imageUrl" name="imageUrl" type="url" required>
+                        </div>
+                    </div>
+                    <label for="imageFile">Upload foto lokale</label>
+                    <input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" name="bio" rows="4" required></textarea>
+                    <label for="philosophy">Philosophy</label>
+                    <textarea id="philosophy" name="philosophy" rows="4" required></textarea>
+                    <button type="submit">Update Profile</button>
+                    <p id="settingsStatus" class="status" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <p class="eyebrow">Security</p>
+                        <h2>Change Password</h2>
+                    </div>
+                    <span>POST /api/change-password</span>
+                </div>
+                <form id="passwordForm">
+                    <input id="passwordCsrfToken" name="csrf_token" type="hidden">
+                    <div class="grid-two">
+                        <div>
+                            <label for="currentPassword">Password aktual</label>
+                            <input id="currentPassword" name="currentPassword" type="password" required>
+                        </div>
+                        <div>
+                            <label for="newPassword">Password i ri</label>
+                            <input id="newPassword" name="newPassword" type="password" required>
+                        </div>
+                    </div>
+                    <label for="confirmPassword">Konfirmo password-in</label>
+                    <input id="confirmPassword" name="confirmPassword" type="password" required>
+                    <button type="submit">Ndrysho Password</button>
+                    <p id="passwordStatus" class="status" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <p class="eyebrow">Projects</p>
+                        <h2>Shto Projekt</h2>
+                    </div>
+                    <span>POST /api/projects</span>
+                </div>
+                <form id="projectForm">
+                    <input id="projectCsrfToken" name="csrf_token" type="hidden">
+                    <label for="projectTitle">Emri i Projektit</label>
+                    <input id="projectTitle" name="title" type="text" required>
+                    <label for="projectDescription">Pershkrimi</label>
+                    <textarea id="projectDescription" name="description" rows="5" required></textarea>
+                    <label for="projectStack">Teknologjite</label>
+                    <input id="projectStack" name="stack" type="text" placeholder="Java, MySQL, HTML, CSS" required>
+                    <button type="submit">Ruaj Projektin</button>
+                    <p id="projectStatus" class="status" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <p class="eyebrow">Projects</p>
+                        <h2>Menaxho Projektet</h2>
+                    </div>
+                    <span>GET / PUT / DELETE /api/projects</span>
+                </div>
+                <div style="overflow:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Titulli</th>
+                                <th>Pershkrimi</th>
+                                <th>Teknologjite</th>
+                                <th>Veprimet</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody"></tbody>
+                    </table>
+                </div>
+                <p id="projectsEmpty" class="empty-state" hidden>Nuk ka ende projekte.</p>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <div>
+                        <p class="eyebrow">Messages</p>
+                        <h2>Mesazhet</h2>
+                    </div>
+                    <span>GET / DELETE /api/messages</span>
+                </div>
+                <div style="overflow:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Emri</th>
+                                <th>Email</th>
+                                <th>Mesazhi</th>
+                                <th>Data</th>
+                                <th>Veprimi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messagesTableBody"></tbody>
+                    </table>
+                </div>
+                <p id="messagesEmpty" class="empty-state" hidden>Nuk ka ende mesazhe te ruajtura.</p>
+            </section>
+        </div>
+    </main>
+
+    <div id="editModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" data-close="true"></div>
+        <section class="modal-card" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div>
+                    <p class="eyebrow">Edit Project</p>
+                    <h2>Ndrysho Projektin</h2>
+                </div>
+                <button id="closeModalButton" class="icon-button" type="button">×</button>
+            </div>
+            <form id="editProjectForm">
+                <input id="editId" name="id" type="hidden">
+                <input id="editCsrfToken" name="csrf_token" type="hidden">
+                <label for="editTitle">Titulli</label>
+                <input id="editTitle" name="title" type="text" required>
+                <label for="editDescription">Pershkrimi</label>
+                <textarea id="editDescription" name="description" rows="5" required></textarea>
+                <label for="editStack">Teknologjite</label>
+                <input id="editStack" name="stack" type="text" required>
+                <button type="submit">Ruaj Ndryshimet</button>
+                <p id="editStatus" class="status" aria-live="polite"></p>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        const settingsForm = document.getElementById("settingsForm");
+        const settingsStatus = document.getElementById("settingsStatus");
+        const passwordForm = document.getElementById("passwordForm");
+        const passwordStatus = document.getElementById("passwordStatus");
+        const projectForm = document.getElementById("projectForm");
+        const projectStatus = document.getElementById("projectStatus");
+        const projectsTableBody = document.getElementById("projectsTableBody");
+        const projectsEmpty = document.getElementById("projectsEmpty");
+        const messagesTableBody = document.getElementById("messagesTableBody");
+        const messagesEmpty = document.getElementById("messagesEmpty");
+        const editModal = document.getElementById("editModal");
+        const closeModalButton = document.getElementById("closeModalButton");
+        const editProjectForm = document.getElementById("editProjectForm");
+        const editStatus = document.getElementById("editStatus");
+
+        const settingsCsrfToken = document.getElementById("settingsCsrfToken");
+        const passwordCsrfToken = document.getElementById("passwordCsrfToken");
+        const projectCsrfToken = document.getElementById("projectCsrfToken");
+        const editCsrfToken = document.getElementById("editCsrfToken");
+        const logoutCsrfToken = document.getElementById("logoutCsrfToken");
+        const imageFileInput = document.getElementById("imageFile");
+        let csrfToken = "";
+
+        async function apiFetch(url, options = {}) {
+            const response = await fetch(url, options);
+            const text = await response.text();
+            const payload = text ? JSON.parse(text) : {};
+            if (!response.ok) {
+                throw new Error(payload.error || "Kerkesa deshtoi.");
+            }
+            return payload;
+        }
+
+        async function uploadSelectedImage() {
+            const file = imageFileInput.files[0];
+            if (!file) {
+                return null;
+            }
+
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const result = String(reader.result);
+                    const commaIndex = result.indexOf(",");
+                    resolve(commaIndex >= 0 ? result.substring(commaIndex + 1) : result);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+
+            const payload = await apiFetch("/api/upload-image", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({
+                    csrf_token: csrfToken,
+                    imageName: file.name,
+                    imageData: base64
+                })
+            });
+
+            return payload.imageUrl;
+        }
+
+        async function loadCsrfToken() {
+            const payload = await apiFetch("/api/csrf-token");
+            csrfToken = payload.token;
+            settingsCsrfToken.value = csrfToken;
+            passwordCsrfToken.value = csrfToken;
+            projectCsrfToken.value = csrfToken;
+            editCsrfToken.value = csrfToken;
+            logoutCsrfToken.value = csrfToken;
+        }
+
+        async function loadProfile() {
+            const profile = await apiFetch("/api/profile");
+            document.getElementById("fullName").value = profile.fullName;
+            document.getElementById("title").value = profile.title;
+            document.getElementById("age").value = profile.age;
+            document.getElementById("location").value = profile.location;
+            document.getElementById("email").value = profile.email;
+            document.getElementById("imageUrl").value = profile.imageUrl;
+            document.getElementById("bio").value = profile.bio;
+            document.getElementById("philosophy").value = profile.philosophy;
+        }
+
+        async function loadProjects() {
+            const projects = await apiFetch("/api/projects");
+            if (!projects.length) {
+                projectsTableBody.innerHTML = "";
+                projectsEmpty.hidden = false;
+                return;
+            }
+            projectsEmpty.hidden = true;
+            projectsTableBody.innerHTML = projects.map((project) => `
+                <tr>
+                    <td>${project.id}</td>
+                    <td>${project.title}</td>
+                    <td>${project.description}</td>
+                    <td>${project.stack}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button type="button" class="secondary" data-edit-id="${project.id}" data-edit-title="${encodeURIComponent(project.title)}" data-edit-description="${encodeURIComponent(project.description)}" data-edit-stack="${encodeURIComponent(project.stack)}">Ndrysho</button>
+                            <button type="button" class="danger" data-delete-project="${project.id}">Fshi</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        async function loadMessages() {
+            const messages = await apiFetch("/api/messages");
+            if (!messages.length) {
+                messagesTableBody.innerHTML = "";
+                messagesEmpty.hidden = false;
+                return;
+            }
+            messagesEmpty.hidden = true;
+            messagesTableBody.innerHTML = messages.map((message) => `
+                <tr>
+                    <td>${message.senderName}</td>
+                    <td>${message.email}</td>
+                    <td>${message.body}</td>
+                    <td>${message.createdAt}</td>
+                    <td><button type="button" class="danger" data-delete-message="${message.id}">Fshi</button></td>
+                </tr>
+            `).join("");
+        }
+
+        settingsForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            settingsStatus.className = "status";
+            settingsStatus.textContent = "";
+            try {
+                const uploadedImageUrl = await uploadSelectedImage();
+                if (uploadedImageUrl) {
+                    document.getElementById("imageUrl").value = uploadedImageUrl;
+                }
+
+                await apiFetch("/api/settings", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams(new FormData(settingsForm))
+                });
+                settingsStatus.className = "status success";
+                settingsStatus.textContent = "Profili u perditesua me sukses.";
+                imageFileInput.value = "";
+            } catch (error) {
+                settingsStatus.className = "status error";
+                settingsStatus.textContent = error.message;
+            }
+        });
+
+        passwordForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            passwordStatus.className = "status";
+            passwordStatus.textContent = "";
+            try {
+                await apiFetch("/api/change-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams(new FormData(passwordForm))
+                });
+                passwordForm.reset();
+                passwordCsrfToken.value = csrfToken;
+                passwordStatus.className = "status success";
+                passwordStatus.textContent = "Password-i u ndryshua me sukses.";
+            } catch (error) {
+                passwordStatus.className = "status error";
+                passwordStatus.textContent = error.message;
+            }
+        });
+
+        projectForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            projectStatus.className = "status";
+            projectStatus.textContent = "";
+            try {
+                await apiFetch("/api/projects", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams(new FormData(projectForm))
+                });
+                projectForm.reset();
+                projectCsrfToken.value = csrfToken;
+                projectStatus.className = "status success";
+                projectStatus.textContent = "Projekti u ruajt me sukses.";
+                await loadProjects();
+            } catch (error) {
+                projectStatus.className = "status error";
+                projectStatus.textContent = error.message;
+            }
+        });
+
+        projectsTableBody.addEventListener("click", async (event) => {
+            const deleteId = event.target.getAttribute("data-delete-project");
+            const editId = event.target.getAttribute("data-edit-id");
+            if (editId) {
+                document.getElementById("editId").value = editId;
+                document.getElementById("editTitle").value = decodeURIComponent(event.target.getAttribute("data-edit-title"));
+                document.getElementById("editDescription").value = decodeURIComponent(event.target.getAttribute("data-edit-description"));
+                document.getElementById("editStack").value = decodeURIComponent(event.target.getAttribute("data-edit-stack"));
+                editStatus.className = "status";
+                editStatus.textContent = "";
+                editModal.classList.add("is-open");
+                return;
+            }
+            if (deleteId) {
+                if (!confirm("A je i sigurt qe do ta fshish kete projekt?")) {
+                    return;
+                }
+                await apiFetch(`/api/projects/${deleteId}`, { method: "DELETE", headers: { "X-CSRF-Token": csrfToken } });
+                await loadProjects();
+            }
+        });
+
+        messagesTableBody.addEventListener("click", async (event) => {
+            const deleteId = event.target.getAttribute("data-delete-message");
+            if (!deleteId) {
+                return;
+            }
+            if (!confirm("A je i sigurt qe do ta fshish kete mesazh?")) {
+                return;
+            }
+            await apiFetch(`/api/messages/${deleteId}`, { method: "DELETE", headers: { "X-CSRF-Token": csrfToken } });
+            await loadMessages();
+        });
+
+        editProjectForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const id = document.getElementById("editId").value;
+            editStatus.className = "status";
+            editStatus.textContent = "";
+            try {
+                await apiFetch(`/api/projects/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams(new FormData(editProjectForm))
+                });
+                editStatus.className = "status success";
+                editStatus.textContent = "Projekti u perditesua me sukses.";
+                await loadProjects();
+                setTimeout(() => editModal.classList.remove("is-open"), 400);
+            } catch (error) {
+                editStatus.className = "status error";
+                editStatus.textContent = error.message;
+            }
+        });
+
+        closeModalButton.addEventListener("click", () => editModal.classList.remove("is-open"));
+        editModal.addEventListener("click", (event) => {
+            if (event.target.dataset.close === "true") {
+                editModal.classList.remove("is-open");
+            }
+        });
+
+        Promise.all([loadCsrfToken(), loadProfile(), loadProjects(), loadMessages()]).catch((error) => {
+            console.error(error);
+        });
+    </script>
+</body>
+</html>

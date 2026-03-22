@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arlind Hyseni | Portfolio CMS</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: rgba(15, 23, 42, 0.9);
+            --panel-border: rgba(148, 163, 184, 0.16);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --cyan: #06b6d4;
+            --purple: #a855f7;
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top, rgba(6, 182, 212, 0.16), transparent 28%),
+                radial-gradient(circle at right, rgba(168, 85, 247, 0.18), transparent 30%),
+                linear-gradient(180deg, #020617, #0f172a 30%, #020617 100%);
+        }
+        .shell { width: min(1120px, calc(100% - 28px)); margin: 0 auto; }
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(14px);
+            background: rgba(2, 6, 23, 0.74);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+        }
+        .navbar-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding: 16px 0;
+        }
+        .brand { color: var(--text); text-decoration: none; font-weight: 800; letter-spacing: 0.04em; }
+        .nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-weight: 600; }
+        .nav-links a:hover, .brand:hover { color: var(--cyan); }
+
+        .hero {
+            min-height: 92vh;
+            display: grid;
+            align-items: center;
+            padding: 56px 0 36px;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(240px, 320px) minmax(0, 1fr) minmax(260px, 0.9fr);
+            gap: 28px;
+            align-items: center;
+        }
+        .profile-frame {
+            width: min(280px, 100%);
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            box-shadow: 0 0 35px rgba(6, 182, 212, 0.28), 0 0 55px rgba(168, 85, 247, 0.2);
+            margin: 0 auto;
+        }
+        .profile-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+            border: 5px solid rgba(2, 6, 23, 0.9);
+        }
+        .eyebrow { text-transform: uppercase; letter-spacing: 0.18em; color: var(--cyan); font-size: 0.85rem; }
+        h1 { font-size: clamp(3rem, 7vw, 5.6rem); line-height: 0.94; margin: 8px 0 14px; }
+        .subtitle { color: #c4b5fd; font-size: 1.35rem; margin: 0 0 16px; font-weight: 700; }
+        .hero-copy, .about-text, .contact-info p, .project-card p { color: var(--muted); line-height: 1.8; }
+        .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 26px; }
+        .cta, .ghost {
+            display: inline-flex; align-items: center; justify-content: center; padding: 14px 18px; border-radius: 999px;
+            text-decoration: none; font-weight: 700; transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .cta { color: #03111c; background: linear-gradient(135deg, var(--cyan), #67e8f9); box-shadow: 0 0 0 1px rgba(103, 232, 249, 0.2), 0 0 28px rgba(6, 182, 212, 0.35); }
+        .ghost { color: var(--text); border: 1px solid rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.08); box-shadow: 0 0 24px rgba(168, 85, 247, 0.16); }
+        .cta:hover, .ghost:hover { transform: translateY(-2px); }
+        .hero-panel, .section-panel, .contact-form { background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.84)); border: 1px solid var(--panel-border); border-radius: 24px; box-shadow: var(--shadow); }
+        .hero-panel { padding: 24px; display: grid; gap: 14px; align-content: center; }
+        .hero-stat { padding: 14px 16px; border-radius: 18px; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.12); }
+        .hero-stat strong { display: block; color: var(--cyan); font-size: 1.8rem; }
+        section { padding: 24px 0; }
+        .section-header { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 18px; }
+        .section-header p { margin: 0 0 8px; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.78rem; }
+        .section-header h2 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.5rem); }
+        .section-header span { color: var(--muted); }
+        .section-panel { padding: 28px; }
+        .about-grid, .contact-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+        .projects-grid, .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; }
+        .project-card, .skill-card {
+            padding: 20px; border-radius: 20px; background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(6, 182, 212, 0.14); box-shadow: 0 10px 30px rgba(2, 6, 23, 0.5);
+        }
+        .project-stack, .skill-category {
+            display: inline-flex; padding: 8px 12px; border-radius: 999px; background: rgba(168, 85, 247, 0.14);
+            color: #d8b4fe; font-weight: 700; font-size: 0.85rem; margin-bottom: 12px;
+        }
+        .skill-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+        .contact-info { padding: 28px; border-radius: 24px; background: linear-gradient(180deg, rgba(168, 85, 247, 0.12), rgba(6, 182, 212, 0.08)); border: 1px solid rgba(168, 85, 247, 0.18); box-shadow: var(--shadow); }
+        .contact-form { padding: 28px; display: grid; gap: 12px; }
+        label { font-weight: 600; color: #cbd5e1; }
+        input, textarea {
+            width: 100%; padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(148, 163, 184, 0.18);
+            background: rgba(15, 23, 42, 0.76); color: var(--text); font: inherit;
+        }
+        input:focus, textarea:focus { outline: 2px solid rgba(6, 182, 212, 0.24); border-color: rgba(6, 182, 212, 0.4); }
+        button[type="submit"] {
+            margin-top: 6px; border: none; border-radius: 16px; padding: 14px 18px;
+            background: linear-gradient(135deg, var(--purple), var(--cyan)); color: white; font: inherit; font-weight: 800; cursor: pointer;
+            box-shadow: 0 0 28px rgba(168, 85, 247, 0.28);
+        }
+        .status { min-height: 24px; margin: 0; font-weight: 700; }
+        .status.success { color: #67e8f9; }
+        .status.error { color: #fda4af; }
+        footer { padding: 28px 0 42px; color: var(--muted); text-align: center; }
+        @media (max-width: 768px) {
+            .hero-grid, .about-grid, .contact-layout { grid-template-columns: 1fr; }
+            .hero-grid { text-align: center; }
+            .hero-copy { margin: 0 auto; }
+            .hero-actions { justify-content: center; }
+            .projects-grid { grid-template-columns: 1fr; }
+            h1 { font-size: clamp(2.3rem, 12vw, 3.8rem); }
+            .navbar-inner { align-items: start; }
+            .nav-links { width: 100%; justify-content: space-between; }
+        }
+        @media (max-width: 640px) {
+            .navbar-inner, .section-header { flex-direction: column; align-items: start; }
+            .nav-links { gap: 12px; }
+            .hero { min-height: auto; padding-top: 42px; }
+            .shell { width: min(100% - 20px, 1120px); }
+            .profile-frame { width: 190px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="shell navbar-inner">
+            <a href="#home" class="brand" id="brandName">Arlind Hyseni</a>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="shell">
+        <header id="home" class="hero">
+            <div class="hero-grid">
+                <div class="profile-frame">
+                    <img id="profileImage" src="https://ui-avatars.com/api/?name=Arlind+Hyseni&background=0f172a&color=06b6d4&size=280" alt="Profile image">
+                </div>
+                <div>
+                    <p class="eyebrow">Portfolio CMS Edition</p>
+                    <h1 id="heroName">Arlind Hyseni</h1>
+                    <p class="subtitle" id="heroTitle">Full-Stack Software Engineer</p>
+                    <p class="hero-copy" id="heroBio">Ndertoj produkte moderne me Java, API te pastra dhe databaza reale MySQL.</p>
+                    <div class="hero-actions">
+                        <a class="cta" href="#contact">Me Kontakto</a>
+                        <a class="ghost" href="#projects">Shiko Projektet</a>
+                    </div>
+                </div>
+                <aside class="hero-panel">
+                    <div class="hero-stat">
+                        <strong id="projectCount">0</strong>
+                        <span>Projekte nga databaza</span>
+                    </div>
+                    <h2 id="heroMetaTitle">Public side i lidhur me CMS</h2>
+                    <p id="heroMetaText">Profili, skills dhe projektet lexohen direkt nga databaza.</p>
+                </aside>
+            </div>
+        </header>
+
+        <main>
+            <section id="about">
+                <div class="section-header">
+                    <div>
+                        <p>About</p>
+                        <h2>About Me</h2>
+                    </div>
+                    <span id="aboutMeta">Age and location</span>
+                </div>
+                <div class="section-panel about-grid">
+                    <div>
+                        <h3 id="aboutName">Arlind Hyseni</h3>
+                        <p class="about-text" id="aboutBio"></p>
+                    </div>
+                    <div>
+                        <h3>Filozofia ime</h3>
+                        <p class="about-text" id="philosophyText">Programimi nuk eshte thjesht kodim; eshte arkitektura e se ardhmes.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="skills">
+                <div class="section-header">
+                    <div>
+                        <p>Skills</p>
+                        <h2>Teknologjite e mia</h2>
+                    </div>
+                    <span>Frontend, Backend dhe Database</span>
+                </div>
+                <div class="section-panel">
+                    <div id="skillsGrid" class="skills-grid"></div>
+                </div>
+            </section>
+
+            <section id="projects">
+                <div class="section-header">
+                    <div>
+                        <p>Projects</p>
+                        <h2>Projektet e mia</h2>
+                    </div>
+                    <span>Kartela dinamike nga MySQL</span>
+                </div>
+                <div class="section-panel">
+                    <div id="projectsGrid" class="projects-grid"></div>
+                </div>
+            </section>
+
+            <section id="contact">
+                <div class="section-header">
+                    <div>
+                        <p>Contact</p>
+                        <h2>Le te lidhemi</h2>
+                    </div>
+                    <span>Dergon mesazhin direkt ne databaze</span>
+                </div>
+                <div class="contact-layout">
+                    <aside class="contact-info">
+                        <h3>Projekt, bashkepunim apo pyetje?</h3>
+                        <p id="contactInfoText">Mesazhi yt ruhet direkt ne CMS dhe mund te lexohet nga admin dashboard.</p>
+                        <p id="contactEmail">Email: arlind@example.com</p>
+                        <p id="contactLocation">Vendndodhja: Kosove</p>
+                    </aside>
+                    <form id="contactForm" class="contact-form">
+                        <input id="contactCsrfToken" name="csrf_token" type="hidden">
+                        <label for="name">Emri</label>
+                        <input id="name" name="name" type="text" required>
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" required>
+                        <label for="message">Mesazhi</label>
+                        <textarea id="message" name="message" rows="6" required></textarea>
+                        <button type="submit">Dergo Mesazhin</button>
+                        <p id="contactStatus" class="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer id="footerText">Arlind Hyseni Portfolio</footer>
+
+    <script>
+        const skillIcons = {
+            "HTML": "🌐",
+            "CSS": "🎨",
+            "JavaScript": "⚡",
+            "Bootstrap": "🧩",
+            "GitHub": "🐙",
+            "Java": "☕",
+            "PHP": "🐘",
+            "MySQL (Advanced)": "🗄️"
+        };
+
+        const projectsGrid = document.getElementById("projectsGrid");
+        const skillsGrid = document.getElementById("skillsGrid");
+        const projectCount = document.getElementById("projectCount");
+        const contactForm = document.getElementById("contactForm");
+        const contactStatus = document.getElementById("contactStatus");
+        const contactCsrfToken = document.getElementById("contactCsrfToken");
+
+        async function loadCsrfToken() {
+            const response = await fetch("/api/csrf-token");
+            const payload = await response.json();
+            contactCsrfToken.value = payload.token;
+        }
+
+        async function loadProfile() {
+            const response = await fetch("/api/profile");
+            const profile = await response.json();
+
+            document.getElementById("brandName").textContent = profile.fullName;
+            document.getElementById("heroName").textContent = profile.fullName;
+            document.getElementById("heroTitle").textContent = profile.title;
+            document.getElementById("heroBio").textContent = profile.bio;
+            document.getElementById("profileImage").src = profile.imageUrl;
+            document.getElementById("aboutName").textContent = profile.fullName;
+            document.getElementById("aboutBio").textContent = profile.bio;
+            document.getElementById("philosophyText").textContent = profile.philosophy;
+            document.getElementById("aboutMeta").textContent = `${profile.age} vjec • ${profile.location}`;
+            document.getElementById("contactEmail").textContent = `Email: ${profile.email}`;
+            document.getElementById("contactLocation").textContent = `Vendndodhja: ${profile.location}`;
+            document.getElementById("heroMetaTitle").textContent = `${profile.age} vjec • ${profile.location}`;
+            document.getElementById("heroMetaText").textContent = profile.philosophy;
+            document.getElementById("footerText").textContent = `${profile.fullName} Portfolio`;
+        }
+
+        async function loadSkills() {
+            const response = await fetch("/api/skills");
+            const skills = await response.json();
+
+            skillsGrid.innerHTML = skills.map((skill) => `
+                <article class="skill-card">
+                    <span class="skill-icon">${skillIcons[skill.skillName] || "✨"}</span>
+                    <div class="skill-category">${skill.category}</div>
+                    <h3>${skill.skillName}</h3>
+                </article>
+            `).join("");
+        }
+
+        async function loadProjects() {
+            const response = await fetch("/api/projects");
+            const projects = await response.json();
+            projectCount.textContent = projects.length;
+
+            if (!projects.length) {
+                projectsGrid.innerHTML = '<article class="project-card"><h3>Asnje projekt ende</h3><p>Projektet do te shfaqen ketu sapo te ruhen nga admin paneli.</p></article>';
+                return;
+            }
+
+            projectsGrid.innerHTML = projects.map((project) => `
+                <article class="project-card">
+                    <div class="project-stack">${project.stack}</div>
+                    <h3>${project.title}</h3>
+                    <p>${project.description}</p>
+                </article>
+            `).join("");
+        }
+
+        contactForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new URLSearchParams(new FormData(contactForm));
+            contactStatus.className = "status";
+            contactStatus.textContent = "";
+
+            try {
+                const response = await fetch("/api/contact", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: formData
+                });
+                const payload = await response.json();
+                if (!response.ok) {
+                    throw new Error(payload.error || "Mesazhi nuk u dergua.");
+                }
+                contactForm.reset();
+                contactCsrfToken.value = formData.get("csrf_token");
+                contactStatus.className = "status success";
+                contactStatus.textContent = "Mesazhi u dergua me sukses!";
+            } catch (error) {
+                contactStatus.className = "status error";
+                contactStatus.textContent = error.message;
+            }
+        });
+
+        Promise.all([loadCsrfToken(), loadProfile(), loadSkills(), loadProjects()]).catch(() => {
+            projectsGrid.innerHTML = '<article class="project-card"><h3>Gabim</h3><p>Te dhenat nuk u ngarkuan dot.</p></article>';
+        });
+    </script>
+</body>
+</html>
